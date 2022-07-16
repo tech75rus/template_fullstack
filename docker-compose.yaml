@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: ./docker/php-fpm/dev
+    volumes:
+      - ./api:/var/www/api
+    restart: always
+
+  nginx:
+    image: nginx:stable
+    volumes:
+      - ./docker/nginx/dev/default.conf:/etc/nginx/conf.d/default.conf
+      - ./api:/var/www/api
+    ports:
+      - 80:80
+    restart: always
+
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_value:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: goodlavka_com
+      MYSQL_USER: gladkix
+      MYSQL_PASSWORD: 666666qq
+    restart: always
+
+  app:
+    build:
+      context: ./docker/app/dev
+    ports:
+      - 7777:8080
+    volumes:
+      - ./app:/var/www/app
+    restart: always
+
+  admin:
+    build:
+      context: ./docker/admin/dev
+    ports:
+      - 7778:8080
+    volumes:
+      - ./admin:/var/www/admin
+    restart: always
+
+
+volumes:
+  mysql_value:
